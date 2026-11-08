@@ -1,0 +1,54 @@
+; ============================================================================
+; YBH Virtual Audio - INF 模板（不是可直接安装的成品）
+;
+; 用法：以微软 MSVAD / SYSVAD 示例的 INF 为基准，把下面这些关键段落替换进去：
+;   - 设备描述与硬件 ID
+;   - 端点名（render / capture）
+;   - 默认格式（48 kHz / 16 bit / 2 ch）
+; 其余 Registration / Interface 段落请原样保留示例中的内容。
+; ============================================================================
+
+[Version]
+Signature="$WINDOWS NT$"
+Class=MEDIA
+ClassGuid={4d36e96c-e325-11ce-bfc1-08002be10318}
+Provider=%Provider%
+CatalogFile=YbhVirtualAudio.cat
+DriverVer=11/08/2026,0.1.0.0
+PnpLockdown=1
+
+[Manufacturer]
+%Provider%=YbhVirtualAudio,NTamd64
+
+[YbhVirtualAudio.NTamd64]
+%DeviceDesc%=YbhVirtualAudio_Install, ROOT\YbhVirtualAudio
+
+[YbhVirtualAudio_Install]
+Include=ks.inf,wdmaudio.inf
+Needs=KS.Registration,WDMAUDIO.Registration
+CopyFiles=YbhVirtualAudio_CopyFiles
+AddReg=YbhVirtualAudio_AddReg
+
+[YbhVirtualAudio_CopyFiles]
+YbhVirtualAudio.sys
+
+; ---------------------------------------------------------------------------
+; 端点相关注册项。MSVAD 用 topology / wave 两个子设备描述符，
+; 具体键名请对照示例的 AddReg 段落补齐。
+; ---------------------------------------------------------------------------
+[YbhVirtualAudio_AddReg]
+HKR,,FriendlyName,,%DeviceDesc%
+HKR,,Icon,,-5
+; 默认格式：48 kHz / 16 bit / 2 ch
+HKR,Settings,SampleRate,,0x00010001,48000
+HKR,Settings,BitsPerSample,,0x00010001,16
+HKR,Settings,Channels,,0x00010001,2
+; 环形缓冲深度（毫秒）
+HKR,Settings,RingBufferMs,,0x00010001,200
+
+[Strings]
+Provider="YBH"
+DeviceDesc="YBH Virtual Audio"
+; 端点显示名（在 adapter.cpp 的 KSDATARANGE / 属性里同样要改）
+SpeakerName="YBH Virtual Speaker"
+MicName="YBH Virtual Mic"

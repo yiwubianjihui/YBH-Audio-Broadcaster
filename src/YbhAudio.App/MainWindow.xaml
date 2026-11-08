@@ -1,0 +1,210 @@
+<Window x:Class="YbhAudio.App.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="YBH 音频广播助手"
+        Height="800" Width="760"
+        MinHeight="560" MinWidth="700"
+        WindowStartupLocation="CenterScreen"
+        FontFamily="Microsoft YaHei UI" FontSize="13"
+        Background="#F5F6F8">
+
+    <Window.Resources>
+        <Style x:Key="Card" TargetType="Border">
+            <Setter Property="Background" Value="White" />
+            <Setter Property="CornerRadius" Value="8" />
+            <Setter Property="Padding" Value="14" />
+            <Setter Property="Margin" Value="0,0,0,10" />
+        </Style>
+        <Style x:Key="CardTitle" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="15" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="Foreground" Value="#111827" />
+            <Setter Property="Margin" Value="0,0,0,6" />
+        </Style>
+        <Style x:Key="Hint" TargetType="TextBlock">
+            <Setter Property="Foreground" Value="#6B7280" />
+            <Setter Property="TextWrapping" Value="Wrap" />
+        </Style>
+        <Style x:Key="StateText" TargetType="TextBlock">
+            <Setter Property="Foreground" Value="#9CA3AF" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+            <Setter Property="Margin" Value="12,0" />
+        </Style>
+        <Style x:Key="Meter" TargetType="ProgressBar">
+            <Setter Property="Height" Value="6" />
+            <Setter Property="Maximum" Value="1" />
+            <Setter Property="Margin" Value="0,10,0,0" />
+            <Setter Property="Foreground" Value="#2563EB" />
+            <Setter Property="Background" Value="#E5E7EB" />
+            <Setter Property="BorderThickness" Value="0" />
+        </Style>
+    </Window.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <ScrollViewer Grid.Row="0" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+            <Grid Margin="18,16,18,6">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+
+                <!-- 标题 -->
+                <StackPanel Grid.Row="0" Margin="0,0,0,12">
+                    <TextBlock Text="YBH 音频广播助手" FontSize="22" FontWeight="SemiBold" Foreground="#111827" />
+                    <TextBlock Text="把系统声音或音频文件送进虚拟麦克风，并用扬声器监听"
+                               Style="{StaticResource Hint}" Margin="0,4,0,0" />
+                </StackPanel>
+
+                <!-- 基本设置 -->
+                <Border Grid.Row="1" Style="{StaticResource Card}">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+
+                        <TextBlock Grid.Row="0" Grid.Column="0" Text="目标虚拟麦克风" VerticalAlignment="Center" Margin="0,0,10,8" />
+                        <ComboBox Grid.Row="0" Grid.Column="1" x:Name="VirtualSpeakerBox"
+                                  DisplayMemberPath="Name" Margin="0,0,10,8" Height="30" VerticalContentAlignment="Center" />
+                        <Button Grid.Row="0" Grid.Column="2" Content="刷新设备" Click="OnRefresh"
+                                Padding="12,4" Margin="0,0,0,8" />
+
+                        <TextBlock Grid.Row="1" Grid.Column="0" Text="扬声器" VerticalAlignment="Center" Margin="0,0,10,8" />
+                        <ComboBox Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2" x:Name="SpeakerBox"
+                                  DisplayMemberPath="Name" Margin="0,0,0,8" Height="30" VerticalContentAlignment="Center" />
+
+                        <TextBlock Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3" x:Name="HintText"
+                                   Style="{StaticResource Hint}" Foreground="#B45309" Margin="0,2,0,0" />
+                    </Grid>
+                </Border>
+
+                <!-- ① 系统音频 -->
+                <Border Grid.Row="2" Style="{StaticResource Card}">
+                    <StackPanel>
+                        <TextBlock Text="① 电脑音频 → 虚拟麦克风" Style="{StaticResource CardTitle}" />
+                        <TextBlock Text="捕获所选扬声器正在播放的所有声音，送进虚拟麦克风。"
+                                   Style="{StaticResource Hint}" Margin="0,0,0,10" />
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="150" />
+                            </Grid.ColumnDefinitions>
+                            <Button x:Name="SystemButton" Content="开始广播" Click="OnSystemToggle" MinWidth="96" Padding="12,5" />
+                            <TextBlock Grid.Column="1" x:Name="SystemState" Text="未开启" Style="{StaticResource StateText}" />
+                            <TextBlock Grid.Column="2" Text="音量" VerticalAlignment="Center" Margin="0,0,8,0" />
+                            <Slider Grid.Column="3" x:Name="SystemVolume" Minimum="0" Maximum="1.5" Value="1"
+                                    ValueChanged="OnSystemVolume" VerticalAlignment="Center" />
+                        </Grid>
+                        <ProgressBar x:Name="SystemLevel" Style="{StaticResource Meter}" />
+                    </StackPanel>
+                </Border>
+
+                <!-- ② 音频文件 -->
+                <Border Grid.Row="3" Style="{StaticResource Card}">
+                    <StackPanel>
+                        <TextBlock Text="② 音频文件 → 虚拟麦克风" Style="{StaticResource CardTitle}" />
+                        <Grid Margin="0,0,0,10">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <TextBox x:Name="FilePathBox" IsReadOnly="True" Text="未选择文件"
+                                     Height="30" VerticalContentAlignment="Center" />
+                            <Button Grid.Column="1" Content="浏览…" Click="OnBrowse" Margin="8,0,0,0" Padding="12,4" />
+                        </Grid>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="150" />
+                            </Grid.ColumnDefinitions>
+                            <Button x:Name="FilePlayButton" Content="播放" Click="OnPlayFile" MinWidth="76" Padding="12,5" />
+                            <Button Grid.Column="1" Content="停止" Click="OnStopFile" MinWidth="76" Padding="12,5" Margin="8,0,0,0" />
+                            <CheckBox Grid.Column="2" x:Name="LoopBox" Content="循环" Margin="14,0,0,0" VerticalAlignment="Center" />
+                            <CheckBox Grid.Column="3" x:Name="MonitorFileBox" Content="本地也听"
+                                      Margin="14,0,0,0" VerticalAlignment="Center" IsChecked="True" />
+                            <TextBlock Grid.Column="4" x:Name="FileState" Text="未播放" Style="{StaticResource StateText}" />
+                            <TextBlock Grid.Column="5" Text="音量" VerticalAlignment="Center" Margin="0,0,8,0" />
+                            <Slider Grid.Column="6" x:Name="FileVolume" Minimum="0" Maximum="1.5" Value="1"
+                                    ValueChanged="OnFileVolume" VerticalAlignment="Center" />
+                        </Grid>
+                        <ProgressBar x:Name="FileLevel" Style="{StaticResource Meter}" />
+                    </StackPanel>
+                </Border>
+
+                <!-- ③ 监听 -->
+                <Border Grid.Row="4" Style="{StaticResource Card}">
+                    <StackPanel>
+                        <TextBlock Text="③ 用扬声器监听麦克风输入" Style="{StaticResource CardTitle}" />
+                        <TextBlock Text="选虚拟麦克风 = 听自己广播出去的内容；选物理麦克风 = 实时返听。建议戴耳机。"
+                                   Style="{StaticResource Hint}" Margin="0,0,0,10" />
+                        <Grid Margin="0,0,0,10">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Text="监听对象" VerticalAlignment="Center" Margin="0,0,10,0" />
+                            <ComboBox Grid.Column="1" x:Name="MicBox" DisplayMemberPath="Name"
+                                      Margin="0,0,10,0" Height="30" VerticalContentAlignment="Center" />
+                            <Button Grid.Column="2" x:Name="MicButton" Content="开始监听" Click="OnMicToggle"
+                                    MinWidth="96" Padding="12,5" />
+                        </Grid>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="150" />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Text="监听音量" VerticalAlignment="Center" Margin="0,0,10,0" />
+                            <TextBlock Grid.Column="1" x:Name="MicState" Text="未开启" Style="{StaticResource StateText}" />
+                            <TextBlock Grid.Column="2" Text="音量" VerticalAlignment="Center" Margin="0,0,8,0" />
+                            <Slider Grid.Column="3" x:Name="MicVolume" Minimum="0" Maximum="1.5" Value="1"
+                                    ValueChanged="OnMicVolume" VerticalAlignment="Center" />
+                        </Grid>
+                        <ProgressBar x:Name="MicLevel" Style="{StaticResource Meter}" />
+                    </StackPanel>
+                </Border>
+
+                <!-- 日志 -->
+                <Border Grid.Row="5" Style="{StaticResource Card}" Margin="0,0,0,0">
+                    <DockPanel>
+                        <TextBlock DockPanel.Dock="Top" Text="运行日志" Style="{StaticResource CardTitle}" />
+                        <TextBox x:Name="LogBox" IsReadOnly="True" BorderThickness="0" Background="#F9FAFB"
+                                 VerticalScrollBarVisibility="Auto" FontFamily="Consolas" FontSize="12" Height="140" />
+                    </DockPanel>
+                </Border>
+            </Grid>
+        </ScrollViewer>
+
+        <!-- 底部操作条固定，不随内容滚动 -->
+        <Border Grid.Row="1" Background="#F5F6F8" Padding="18,8,18,10">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                <Button Content="全部停止" Click="OnStopAll" Padding="16,6" />
+                <Button Content="使用说明" Click="OnHelp" Padding="16,6" Margin="8,0,0,0" />
+            </StackPanel>
+        </Border>
+    </Grid>
+</Window>

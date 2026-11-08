@@ -1,0 +1,19 @@
+# 构建产物
+bin/
+obj/
+publish/
+*.user
+*.suo
+.vs/
+
+# 本地调试与截图
+_dev/
+*.log
+
+# 驱动编译中间产物
+driver/**/x64/
+driver/**/*.sys
+driver/**/*.pdb
+driver/**/*.cer
+driver/**/*.pvk
+driver/**/*.pfx
